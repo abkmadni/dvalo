@@ -1,0 +1,29 @@
+#header a:link,
+#header a:visited {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+}
+
+#header a:hover {
+    background-color: white;
+    color:  rgb(40, 176, 40);
+    border-radius: 5px;
+}
+
+
+#header h1 {
+    margin: 0;
+    padding-top: 20px;
+    text-align: center;
+}
+
+#nav-separator {
+    border: 1px solid white;
+    height: 100%;
+}
+
+nav {
+    display: flex;
+    justify-content: space-evenly;
+}

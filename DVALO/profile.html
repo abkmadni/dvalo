@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVALO Profile</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div id="header" style="background-color: rgb(40, 176, 40);">
+        <div>
+            <h1
+                style="padding-left: 20px; color: white; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: 10vh;">
+                D<i class="fa-brands fa-vuejs" style="font-size: 9vh;"></i>ALO</h1>
+        </div>
+        <div id="nav-separator"></div>
+        <nav style="padding: 10px; padding-right: 20px;">
+            <a href="./index.html">Home</a>
+            <a href="./products.html">Products</a>
+            <a href="./cart.html">Cart</a>
+            <a href="./about.html">About</a>
+            <a id="logout" href="./index.html">Logout</a>
+        </nav>
+    </div>
+    <div id="profile-grid" style="display: grid;">
+        <div class="profile-container">
+            <h1>Profile</h1>
+            <form method="post" action="http://localhost:8090/api/updateUser" id="profileForm">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input id="username" type="text" name="username">
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input id="age" type="text" name="age">
+                </div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <input id="gender" type="text" name="gender">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input id="email" type="text" name="email">
+                </div>
+                <div class="input-group">
+                    <label>Phone</label>
+                    <input id="phone" type="text" name="phone">
+                </div>
+                <div class="input-group">
+                    <label>Address</label>
+                    <input id="address" type="text" name="address">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input id="password" type="password" name="password">
+                </div>
+                <div class="input-group">
+                    <button type="submit" class="btn" name="profile">Update Profile</button>
+                </div>
+            </form>
+        </div>
+        <div class="order-container">
+            <h1>Orders</h1>
+            <div class="order">
+                <h3>Order ID: 1234</h3>
+                <p>Order Date: 12/12/2024</p>
+                <p>Order Status: Delivered</p>
+                <p>Order Total: $100</p>
+            </div>
+            <div class="order">
+                <h3>Order ID: 1235</h3>
+                <p>Order Date: 12/12/2024</p>
+                <p>Order Status: Delivered</p>
+                <p>Order Total: $100</p>
+            </div>
+            <div class="order">
+                <h3>Order ID: 1236</h3>
+                <p>Order Date: 12/12/2024</p>
+                <p>Order Status: Delivered</p>
+                <p>Order Total: $100</p>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>
+            All rights reserved. DVALO 2024
+        </p>
+    </div>
+</body>
+
+<script>
+    populateForm();
+    async function populateForm() {
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            let userDetails = JSON.parse(localStorage.getItem('userDetails'));
+            let response = await fetch(`http://localhost:8090/api/User/${userDetails}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            let data = await response.json();
+            data = data[0];
+            document.getElementById('username').value = data.UserName;
+            document.getElementById('email').value = data.UserEmail;
+            document.getElementById('phone').value = data.UserPhone;
+            document.getElementById('address').value = data.UserAddress;
+            document.getElementById('age').value = data.Age;
+            document.getElementById('gender').value = data.UserGender;
+            let res = await fetch(`http://localhost:8090/api/UserPass/${userDetails}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            let pass = await res.json();
+            document.getElementById('password').value = pass.Password;
+        }
+    }
+
+    //make function when I logout, it will clear the local storage
+    document.getElementById('logout').addEventListener('click', function () {
+        localStorage.clear();
+        alert('You have been logged out');
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+        let form = document.getElementById("profileForm");
+        let formData = new FormData(form);
+        //append userDetails from local storage as UserID at the beginning of formData
+        let userDetails = JSON.parse(localStorage.getItem('userDetails'));
+        formData.append('UserID', userDetails);
+        console.log(Object.fromEntries(formData));
+        let response = await fetch("http://localhost:8090/api/updateUser", {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json()).then(data => {
+            console.log(data);
+            alert("Profile Updated Successfully!");
+        });
+    });
+
+</script>
+
+</html>
